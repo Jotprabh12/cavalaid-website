@@ -67,9 +67,10 @@ async function sendWithRetry(payload: {
 
 export async function POST(req: NextRequest) {
   const apiKey = process.env.RESEND_API_KEY;
-  const to = [process.env.RESEND_TO_EMAIL, "recipient@example.com"].filter(
-    (value): value is string => Boolean(value && value.includes("@")),
-  );
+  const to = (process.env.RESEND_TO_EMAIL ?? "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter((value): value is string => value.includes("@"));
 
   if (to.length === 0 || !apiKey) {
     return NextResponse.json({ error: "Email not configured" }, { status: 500 });
